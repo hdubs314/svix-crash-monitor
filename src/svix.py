@@ -62,9 +62,20 @@ def svix_squared(cdf):
     0.0401
     """
     ## TODO: Implement this function as specified in the docstring above.
-    raise NotImplementedError(
-        "Implement svix_squared (see HOMEWORK INSTRUCTIONS at the top of this file)"
+    grid = cdf.grid
+    forward = cdf.forward
+    tau = cdf.maturity_years
+
+    # select the out of the money option price at each strike
+    otm_prices = np.where(
+        grid <= forward,
+        cdf.put_grid,
+        cdf.call_grid,
     )
+
+    # integrate option prices over strikes, then normalize and annualize
+    option_integral = np.trapezoid(otm_prices, x=grid)
+    return float(2.0*option_integral/(tau*forward))
 
 
 def interpolate_variance(svix2_near, tau_near, svix2_far, tau_far, horizon_years=HORIZON_DAYS / 365.0):
